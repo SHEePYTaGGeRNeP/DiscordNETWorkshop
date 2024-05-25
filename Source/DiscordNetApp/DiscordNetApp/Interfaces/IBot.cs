@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace DiscordNetApp;
+namespace DiscordNetApp.Interfaces;
 
 internal interface IBot
 {

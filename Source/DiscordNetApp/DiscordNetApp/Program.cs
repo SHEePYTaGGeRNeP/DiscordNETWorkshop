@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using DiscordNetApp.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -22,6 +23,7 @@ public static class Program
                    options.AddConsole();
                })
                .AddSingleton(config)
+               .AddScoped<ISlashCommandHandler, SlashCommandHandler>()
                .AddScoped<IBot, Bot>()
                .BuildServiceProvider();
 

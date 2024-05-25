@@ -1,27 +1,23 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Discord.Commands;
 using Discord.WebSocket;
 using Discord;
-using System.Reflection;
+using DiscordNetApp.Interfaces;
 
 namespace DiscordNetApp;
 
 internal class Bot : IBot
 {
-    private readonly static Random _random = new();
-
     private readonly ILogger<Bot> _logger;
     private readonly IConfiguration _config;
+    private readonly ISlashCommandHandler _slashCommandHandler;
     private readonly DiscordSocketClient _client;
-    private readonly CommandService _commands;
     private readonly ulong _appId;
 
-    private ServiceProvider? _serviceProvider;
     private SocketGuild? _guild;
 
-    public Bot(ILogger<Bot> logger, IConfiguration configuration)
+    public Bot(ILogger<Bot> logger, IConfiguration configuration, ISlashCommandHandler slashCommandHandler)
     {
         _logger = logger;
         _config = configuration;
@@ -36,25 +32,27 @@ internal class Bot : IBot
         _client.Log += Log;
         _client.Ready += Client_Ready;
         _client.MessageReceived += Client_MessageReceived;
-        _commands = new CommandService();
+        _slashCommandHandler = slashCommandHandler;
+        _client.SlashCommandExecuted += slashCommandHandler.Client_SlashCommandExecuted;
+        _slashCommandHandler.SetClient(_client);
     }
+
 
     public async Task StartAsync(ServiceProvider services)
     {
         string token = _config.GetSection("Discord")["Token"] ?? throw new Exception("No Token found!");
 
-        _serviceProvider = services;
-        await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), _serviceProvider);
-
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
     }
 
-    private Task Client_Ready()
+    private async Task Client_Ready()
     {
-        _logger.LogInformation("Client_Ready");
-        _guild = _client.Guilds.FirstOrDefault(g => g.Name == "Kennisweekend 2024") ?? _client.Guilds.FirstOrDefault();
-        return Task.CompletedTask;
+        _guild = _client.Guilds.FirstOrDefault(g => g.Name == "Kennisweekend 2024") ?? _client.Guilds.First();
+        _logger.LogInformation($"Client_Ready enter and _guild = {_guild.Name}");
+
+        await _slashCommandHandler.RegisterCommands(_guild);
+        _logger.LogInformation($"Client_Ready done.");
     }
 
     private Task Log(LogMessage msg)
@@ -85,7 +83,7 @@ internal class Bot : IBot
 
             // only works with custom server emojis
             var serverEmotes = await _guild!.GetEmotesAsync();
-            GuildEmote? emote = serverEmotes.ElementAt(_random.Next(serverEmotes.Count)); // (e => e.Name == "Emote name")
+            GuildEmote? emote = serverEmotes.ElementAt(Utils.Random.Next(serverEmotes.Count)); // (e => e.Name == "Emote name")
             if (emote != null)
             {
                 await msg.AddReactionAsync(emote);
@@ -94,7 +92,6 @@ internal class Bot : IBot
             await msg.Author.SendMessageAsync($"Hey {msg.Author.Username}, why did you send: {msg.Content}?");
         }
     }
-
 
     public async Task StopAsync()
     {
