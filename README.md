@@ -11,10 +11,10 @@ All steps are also described here with images: https://docs.discordnet.dev/guide
     1) Go to the "Bot" tab on the left and Click "Add Bot" if needed
     1) Click Reset Token if you didn't get a token yet and copy and store it somewhere (for this project in the user secrets, by right clicking the project => "Manage User Secrets")
     1) Go to the "Privileged Gateway Intents" and check the last one "MESSAGE CONTENT INTENT", so our bot can read server messages.
-    
+
 1) Add your bot to a server
     1) Go to "OAuth2" tab
-    1) Scroll down to OAuth2 URL Generator and under Scopes tick bot.
+    1) Scroll down to OAuth2 URL Generator and under Scopes tick `bot` and `applications.commands`
     1) Scroll down further to Bot Permissions and select the permissions that you wish to assign your bot with. (Probably "Send Messages" )
     1) Open the generated authorization URL in your browser.
     1) Select a server.
