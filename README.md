@@ -4,6 +4,7 @@ Discord.NET workshop for Kennisweekend
 # Get started
 All steps are also described here with images: https://docs.discordnet.dev/guides/getting_started/first-bot.html
 
+1) Create a Discord account
 1) Install the Discord.Net package in your solution (done already in project)
 1) Create a bot on: https://discord.com/developers/applications/
     1) Click "New Application"

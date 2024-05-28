@@ -20,7 +20,7 @@ internal class BierCommand : IDiscordCommand
     {
         IEnumerable<IUser> users = await command.Channel.GetUsersAsync(CacheMode.AllowDownload, RequestOptions.Default).FlattenAsync();
         var randomUser = users.ElementAt(Utils.Random.Next(users.Count()));
-        await command.Channel.SendMessageAsync($"Hey {randomUser.Mention}! Je moet bier halen van {command.User.GlobalName}");
+        await command.RespondAsync($"Hey {randomUser.Mention}! Je moet bier halen van {command.User.GlobalName}");
     }
 
 }

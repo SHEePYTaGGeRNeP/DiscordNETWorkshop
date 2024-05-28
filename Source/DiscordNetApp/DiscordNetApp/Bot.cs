@@ -32,6 +32,7 @@ internal class Bot : IBot
         _client.Log += Log;
         _client.Ready += Client_Ready;
         _client.MessageReceived += Client_MessageReceived;
+        _client.ReactionAdded += _Client_ReactionAdded;
         _slashCommandHandler = slashCommandHandler;
         _client.SlashCommandExecuted += slashCommandHandler.Client_SlashCommandExecuted;
         _slashCommandHandler.SetClient(_client);
@@ -90,6 +91,34 @@ internal class Bot : IBot
             }
 
             await msg.Author.SendMessageAsync($"Hey {msg.Author.Username}, why did you send: {msg.Content}?");
+        }
+
+        if (msg.Content.Contains("kut") && msg.Author is IGuildUser guildUser)
+        {
+            await guildUser.SetTimeOutAsync(TimeSpan.FromSeconds(15));
+            await msg.Author.SendMessageAsync($"Hey {msg.Author.GlobalName}, you've been timed out for saying a bad word.");
+        }
+
+        if (msg.Content.Contains("domme workshop") && !msg.Author.GlobalName.Equals("lorenzo", StringComparison.OrdinalIgnoreCase)
+            && msg.Author is IGuildUser guildUser2)
+        {
+            await guildUser2.KickAsync();
+            await msg.Author.SendMessageAsync($"Hey {msg.Author.GlobalName}, you've been kicked out for spreading lies.");
+        }
+    }
+
+    private async Task _Client_ReactionAdded(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction)
+    {
+        _logger.LogInformation($"Reaction added to {message.Value?.Content} in {channel.Value?.Name}" +
+            $"with {reaction.Emote.Name} by {reaction.User.Value.GlobalName}");
+        
+        // Take the correct guild?
+        var role = _guild!.Roles.FirstOrDefault(x => x.Name.StartsWith(reaction.Emote.Name, StringComparison.OrdinalIgnoreCase));
+
+        if (role != null && reaction.User.GetValueOrDefault() is IGuildUser guildUser)
+        {
+            _logger.LogInformation($"Giving {guildUser.GlobalName} the role: {role.Name}");
+            await guildUser.AddRoleAsync(role);
         }
     }
 

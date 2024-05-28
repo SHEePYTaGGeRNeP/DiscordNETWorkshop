@@ -31,11 +31,11 @@ internal class DogFactCommand : IDiscordCommand
         var dogFact = JsonSerializer.Deserialize<DogFactResponse>(response);
         if (dogFact == null || !dogFact.success || dogFact.facts == null)
         {
-            await command.Channel.SendMessageAsync($"Something went wrong: {result}");
+            await command.RespondAsync($"Something went wrong: {result}");
         }
         else
         {
-            await command.Channel.SendMessageAsync(dogFact.facts[0]);
+            await command.RespondAsync($"Random dog fact: {dogFact.facts[0]}");
         }
     }
 

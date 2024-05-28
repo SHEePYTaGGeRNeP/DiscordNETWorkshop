@@ -20,8 +20,12 @@ internal class ListRolesCommand : IDiscordCommand
     public async Task ExecuteAsync(SocketSlashCommand command)
     {
         // We need to extract the user parameter from the command. since we only have one option and it's required, we can just use the first option.
-        var guildUser = (SocketGuildUser)command.Data.Options.First().Value;
-
+        if (command.Data.Options.First().Value is not SocketGuildUser guildUser)
+        {
+            // maybe from a Direct Message command.
+            return;
+        }
+                
         // We remove the everyone role and select the mention of each role.
         var roleList = string.Join(",\n", guildUser.Roles.Where(x => !x.IsEveryone).Select(x => x.Mention));
 
@@ -32,8 +36,10 @@ internal class ListRolesCommand : IDiscordCommand
             .WithColor(Color.Green)
             .WithCurrentTimestamp();
 
+        const bool onlyVisibileForUser = false;
+
         // Now, Let's respond with the embed.
-        await command.RespondAsync(embed: embedBuiler.Build());
+        await command.RespondAsync(embed: embedBuiler.Build(), ephemeral: onlyVisibileForUser);
     }
 
 }
