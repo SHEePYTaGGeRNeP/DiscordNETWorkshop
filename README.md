@@ -22,6 +22,7 @@ All steps are also described here with images: https://docs.discordnet.dev/guide
     1) Click on Authorize.
 
 1) Connecting your bot to Discord
+    1) Right click the project and "Manage User Secrets" and copy from "secrets.example.json" and fill in the right values
     1) Add the following code: 
     ```
     var client = new DiscordSocketClient();

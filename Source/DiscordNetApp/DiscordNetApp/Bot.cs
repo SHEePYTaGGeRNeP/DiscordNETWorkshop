@@ -32,7 +32,7 @@ internal class Bot : IBot
         _client.Log += Log;
         _client.Ready += Client_Ready;
         _client.MessageReceived += Client_MessageReceived;
-        _client.ReactionAdded += _Client_ReactionAdded;
+      //  _client.ReactionAdded += _Client_ReactionAdded;
         _slashCommandHandler = slashCommandHandler;
         _client.SlashCommandExecuted += slashCommandHandler.Client_SlashCommandExecuted;
         _slashCommandHandler.SetClient(_client);
@@ -80,7 +80,7 @@ internal class Bot : IBot
         if (msg.Channel.Name == "bot-gekte")
         {
             await msg.Channel.TriggerTypingAsync();
-            await msg.Channel.SendMessageAsync($"Hey {msg.Author.GlobalName}! Do you want me to tag you? {msg.Author.Mention}");
+           // await msg.Channel.SendMessageAsync($"Hey {msg.Author.GlobalName}! Do you want me to tag you? {msg.Author.Mention}");
 
             // only works with custom server emojis
             var serverEmotes = await _guild!.GetEmotesAsync();
@@ -112,7 +112,12 @@ internal class Bot : IBot
             $"with {reaction.Emote.Name} by {reaction.User.Value.GlobalName}");
 
         // Take the correct guild?
-        var role = _guild!.Roles.FirstOrDefault(x => x.Name.StartsWith(reaction.Emote.Name, StringComparison.OrdinalIgnoreCase));
+        if (channel.Value is not IGuildChannel guildChannel)
+        {
+            return;
+        }
+
+        var role = guildChannel.Guild.Roles.FirstOrDefault(x => x.Name.StartsWith(reaction.Emote.Name, StringComparison.OrdinalIgnoreCase));
 
         if (role != null && reaction.User.GetValueOrDefault() is IGuildUser guildUser)
         {
