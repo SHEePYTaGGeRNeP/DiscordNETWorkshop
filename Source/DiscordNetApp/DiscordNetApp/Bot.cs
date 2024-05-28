@@ -93,14 +93,13 @@ internal class Bot : IBot
             await msg.Author.SendMessageAsync($"Hey {msg.Author.Username}, why did you send: {msg.Content}?");
         }
 
-        if (msg.Content.Contains("kut") && msg.Author is IGuildUser guildUser)
+        if (msg.Content.Contains("kut", StringComparison.OrdinalIgnoreCase) && msg.Author is IGuildUser guildUser)
         {
             await guildUser.SetTimeOutAsync(TimeSpan.FromSeconds(15));
             await msg.Author.SendMessageAsync($"Hey {msg.Author.GlobalName}, you've been timed out for saying a bad word.");
         }
 
-        if (msg.Content.Contains("domme workshop") && !msg.Author.GlobalName.Equals("lorenzo", StringComparison.OrdinalIgnoreCase)
-            && msg.Author is IGuildUser guildUser2)
+        if (msg.Content.Contains("domme workshop", StringComparison.OrdinalIgnoreCase) && msg.Author is IGuildUser guildUser2)
         {
             await guildUser2.KickAsync();
             await msg.Author.SendMessageAsync($"Hey {msg.Author.GlobalName}, you've been kicked out for spreading lies.");
@@ -111,7 +110,7 @@ internal class Bot : IBot
     {
         _logger.LogInformation($"Reaction added to {message.Value?.Content} in {channel.Value?.Name}" +
             $"with {reaction.Emote.Name} by {reaction.User.Value.GlobalName}");
-        
+
         // Take the correct guild?
         var role = _guild!.Roles.FirstOrDefault(x => x.Name.StartsWith(reaction.Emote.Name, StringComparison.OrdinalIgnoreCase));
 
